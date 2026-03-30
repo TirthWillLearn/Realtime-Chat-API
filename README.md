@@ -16,7 +16,11 @@
 Users join rooms, exchange messages, share images, and chat privately via DMs.  
 Built with a focus on real-time performance, Redis caching, and JWT-protected socket connections.
 
+<<<<<<< HEAD
 [Live API](https://your-render-url.onrender.com) · [GitHub](https://github.com/TirthWillLearn/Realtime-Chat-App)
+=======
+[Live API](https://realtime-chat-api-78gu.onrender.com/) · [GitHub](https://github.com/TirthWillLearn/Realtime-Chat-App)
+>>>>>>> fccc227 (docs: add project README with API reference and engineering decisions)
 
 </div>
 
@@ -321,7 +325,11 @@ value: [file]
 
 ```json
 {
+<<<<<<< HEAD
   "url": "https://your-render-url.onrender.com/uploads/chat-1774467640822.jpeg"
+=======
+  "url": "https://realtime-chat-api-78gu.onrender.com/uploads/chat-1774467640822.jpeg"
+>>>>>>> fccc227 (docs: add project README with API reference and engineering decisions)
 }
 ```
 
@@ -332,7 +340,11 @@ value: [file]
 Connect to the server using a Socket.io client. Pass JWT in the handshake:
 
 ```js
+<<<<<<< HEAD
 const socket = io("https://your-render-url.onrender.com", {
+=======
+const socket = io("https://realtime-chat-api-78gu.onrender.com/", {
+>>>>>>> fccc227 (docs: add project README with API reference and engineering decisions)
   auth: { token: "Bearer your_jwt_token" },
 });
 ```
