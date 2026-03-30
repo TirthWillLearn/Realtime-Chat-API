@@ -1,0 +1,23 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+
+# environment variables
+.env
+.env.*
+
+# uploads (user-generated content)
+uploads/
+
+# logs
+logs/
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+
+# Docker
+.dockerignore
