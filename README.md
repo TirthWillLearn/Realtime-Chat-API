@@ -12,9 +12,8 @@
 ![JWT](https://img.shields.io/badge/Auth-JWT-000000?style=flat-square&logo=jsonwebtokens&logoColor=white)
 ![Render](https://img.shields.io/badge/Deployed-Render-46E3B7?style=flat-square&logo=render&logoColor=white)
 
-**A production-style backend API for a real-time chat application built with Socket.io.**  
-Users join rooms, exchange messages, share images, and chat privately via DMs.  
-Built with a focus on real-time performance, Redis caching, and JWT-protected socket connections.
+**A real-time messaging backend designed to handle presence tracking, message delivery, and efficient data retrieval using WebSockets and Redis.**  
+Users join rooms, exchange messages, and maintain accurate online status even during unexpected disconnects.
 
 [Live API](https://realtime-chat-api-78gu.onrender.com/) · [GitHub](https://github.com/TirthWillLearn/Realtime-Chat-App)
 
@@ -25,7 +24,9 @@ Built with a focus on real-time performance, Redis caching, and JWT-protected so
 ## Table of Contents
 
 - [Overview](#overview)
+- [Key Engineering Highlights](#key-engineering-highlights)
 - [Features](#features)
+- [Architecture](#architecture)
 - [Tech Stack](#tech-stack)
 - [Project Structure](#project-structure)
 - [Getting Started](#getting-started)
@@ -35,6 +36,7 @@ Built with a focus on real-time performance, Redis caching, and JWT-protected so
 - [Socket Events](#socket-events)
 - [Key Engineering Decisions](#key-engineering-decisions)
 - [Security](#security)
+- [Limitations & Future Improvements](#limitations--future-improvements)
 - [Deployment](#deployment)
 - [Author](#author)
 
@@ -47,45 +49,30 @@ This API powers the backend of a real-time chat application. It handles user aut
 The core engineering challenge: **how do you track online status when a user's browser crashes without firing a disconnect event?** This is solved using Redis TTL — the status key auto-expires after 30 seconds unless renewed by a client heartbeat, ensuring ghost online statuses never persist.
 
 ---
+## Key Engineering Highlights
+
+- Handles presence tracking using Redis TTL to avoid stale "online" states
+- Reduces database load by caching recent messages (last 50) in Redis
+- Uses Socket.io middleware for one-time JWT authentication per connection
+- Ensures consistent DM room creation using deterministic ID logic (`Math.min/max`)
+
 
 ## Features
 
-### Authentication & Socket Protection
+## Features
 
-- JWT-based authentication (register, login)
-- Socket.io middleware verifies JWT at connection time — one verification for the entire connection lifetime
-- Token passed via handshake auth, query param, or Authorization header
-- Passwords hashed using bcrypt
+- JWT authentication with socket-level authorization
+- Real-time messaging using Socket.io (rooms + DMs)
+- Presence tracking using Redis TTL with heartbeat mechanism
+- Message caching (last 50 messages per room) for fast room joins
+- Image upload and sharing via HTTP + broadcast via sockets
+- Optimized PostgreSQL queries with proper indexing and constraints
 
-### Real-Time Messaging
+## Architecture
 
-- Room-based group chat — users join and leave rooms dynamically
-- Messages saved to PostgreSQL and broadcast to the room in real time
-- Private DMs — consistent room name generated from two user IDs using `Math.min/max` regardless of who initiates
-- Online status tracked per user in Redis with TTL-based auto-expiry
+High-level system design showing real-time message flow and presence tracking.
 
-### Redis Caching
-
-- Last 50 messages per room cached in Redis Lists
-- Cache served instantly on room join — no database query needed
-- Automatic cache trimming on every new message to keep memory usage bounded
-- Online status stored as Redis key-value pairs with 30-second TTL
-
-### Image Sharing
-
-- Image uploads handled via HTTP multipart using Multer
-- File type validation via MIME type checking — only images accepted
-- Unique filenames using timestamps to prevent overwrites
-- Image URL broadcast via Socket.io after upload
-
-### Query Design
-
-- PostgreSQL schema with proper foreign key constraints and cascade deletes
-- Composite primary key on `room_members` prevents duplicate room joins
-- `RETURNING *` on inserts to avoid redundant SELECT queries
-- Messages ordered by `created_at ASC` for chronological history
-
----
+![Architecture](./docs/architecture.png)
 
 ## Tech Stack
 
@@ -432,6 +419,14 @@ Storing binary image data directly in PostgreSQL or Socket.io payloads would be 
 - `.env` and `.env.production` excluded from version control
 
 ---
+
+## Limitations & Future Improvements
+
+- Currently single-server (no horizontal scaling with Redis Pub/Sub)
+- Presence tracking uses polling/TTL — can be optimized further with event-based sync
+- Message history pagination not fully implemented beyond cached 50 messages
+- Can be extended with load balancing and distributed socket handling
+
 
 ## Deployment
 
