@@ -70,7 +70,16 @@ The core engineering challenge: **how do you track online status when a user's b
 
 ## Architecture
 
-High-level system design showing real-time message flow and presence tracking.
+High-level design of the real-time messaging system showing how WebSocket connections, Redis, and database interactions work together.
+
+This system differs from traditional REST APIs by maintaining persistent connections using Socket.io.
+
+Key flow:
+- Client establishes WebSocket connection
+- JWT authentication is verified once at connection
+- Messages are stored in PostgreSQL (source of truth)
+- Redis is used for presence tracking (TTL-based) and caching recent messages (last 50 per room)
+- Events are broadcasted to connected clients in real-time
 
 ![Architecture](./docs/architecture.png)
 
